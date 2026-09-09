@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diccionario operativo de errores PUC — Consubanco</title>
+<style>
+  :root{
+    --navy: #0A2B4C;
+    --navy-2: #123A63;
+    --blue: #1568E3;
+    --blue-dark: #0F4FB0;
+    --blue-tint: #E7F0FE;
+    --cyan: #17ABB8;
+    --cyan-tint: #E3F6F7;
+    --amber: #9A6B12;
+    --amber-tint: #FBF1DA;
+    --green: #1E7A4C;
+    --green-tint: #E4F5EC;
+    --violet: #6E4CB0;
+    --violet-tint: #EFE9F9;
+    --gray-tag: #5C6B7A;
+    --gray-tag-tint: #EEF1F4;
+
+    --bg: #EEF2F6;
+    --surface: #FFFFFF;
+    --border: #DCE3EB;
+    --border-strong: #C2CCD8;
+    --text: #14202E;
+    --text-muted: #5C6B7A;
+    --text-faint: #8C97A4;
+
+    --radius-sm: 7px;
+    --radius-md: 12px;
+    --shadow-sm: 0 1px 2px rgba(10,43,76,0.07);
+    --shadow-md: 0 8px 24px rgba(10,43,76,0.10);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --tap-min: 44px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body{
+    margin: 0;
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  button, input, select { font-family: inherit; font-size: inherit; color: inherit; }
+  button { cursor: pointer; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; animation: none !important; }
+  }
+
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+    outline: 2.5px solid var(--blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* ---------- Header ---------- */
+  .app-header{
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .brand{
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .brand-name{
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.3px;
+  }
+  .brand-divider{
+    width: 1px;
+    height: 16px;
+    background: rgba(255,255,255,0.25);
+  }
+  .brand-product{
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.78);
+    font-weight: 500;
+  }
+  .view-tabs{
+    display: flex;
+    gap: 4px;
+    background: rgba(255,255,255,0.09);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+  }
+  .view-tab{
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.78);
+    padding: 8px 16px;
+    min-height: var(--tap-min);
+    border-radius: 5px;
+    font-size: 13.5px;
+    font-weight: 600;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .view-tab[aria-selected="true"]{
+    background: #fff;
+    color: var(--navy);
+  }
+  .view-tab:hover:not([aria-selected="true"]){
+    background: rgba(255,255,255,0.16);
+  }
+
+  /* ---------- KPI ---------- */
+  .kpi-bar{
+    background: var(--navy-2);
+    color: #fff;
+    display: flex;
+    gap: 0;
+    padding: 0 24px;
+    overflow-x: auto;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .kpi{
+    padding: 10px 22px 10px 0;
+    margin-right: 22px;
+    border-right: 1px solid rgba(255,255,255,0.14);
+    white-space: nowrap;
+  }
+  .kpi:last-child{ border-right: none; margin-right: 0; }
+  .kpi-value{ font-size: 19px; font-weight: 700; }
+  .kpi-label{ font-size: 11.5px; color: rgba(255,255,255,0.66); margin-top: 1px; }
+
+  main{ max-width: 1320px; margin: 0 auto; padding: 20px 24px 44px; }
+
+  /* ---------- Vista de consulta ---------- */
+  .query-view{
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .search-panel{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+
+  .search-controls{
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 5;
+  }
+
+  .search-box{
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 0 10px;
+    background: var(--bg);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .search-box:focus-within{
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-tint);
+    background: var(--surface);
+  }
+  .search-box svg{ flex: none; color: var(--text-faint); }
+  .search-box input{
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 12px 8px;
+    outline: none;
+    color: var(--text);
+    font-size: 15.5px;
+    min-height: var(--tap-min);
+  }
+  .search-clear{
+    background: transparent;
+    border: none;
+    color: var(--text-faint);
+    padding: 6px 8px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    display: none;
+    min-height: 32px;
+  }
+  .search-clear.visible{ display: inline-flex; align-items: center; }
+  .search-clear:hover{ color: var(--text); background: var(--border); }
+
+  .filter-row{ margin-top: 12px; }
+  .filter-label{
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 0 0 5px 2px;
+  }
+  select#filterFuncionalidad{
+    width: 100%;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 10px 10px;
+    background: #fff;
+    min-height: var(--tap-min);
+  }
+
+  .results-meta{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 18px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .results-meta .clear-filter{
+    background: none;
+    border: none;
+    color: var(--blue-dark);
+    font-weight: 700;
+    padding: 4px 6px;
+    display: none;
+    min-height: 32px;
+  }
+  .results-meta .clear-filter.visible{ display: inline-flex; align-items: center; }
+  .results-meta .clear-filter:hover{ text-decoration: underline; }
+
+  .results-list{
+    list-style: none;
+    margin: 0;
+    padding: 6px;
+  }
+  .result-item{
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 1.5px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 12px 12px;
+    margin-bottom: 3px;
+    min-height: var(--tap-min);
+    transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  .result-item:hover{ background: var(--bg); }
+  .result-item[aria-current="true"]{
+    background: var(--blue-tint);
+    border-color: var(--blue);
+  }
+  .result-code{
+    font-weight: 700;
+    font-size: 14.5px;
+    color: var(--navy);
+    letter-spacing: 0.2px;
+  }
+  .result-item[aria-current="true"] .result-code{ color: var(--blue-dark); }
+  .result-meta{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 5px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+  }
+  .func-chip{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+  }
+  .func-dot{
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex: none;
+  }
+  .func-name{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tipo-badge{
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2.5px 8px;
+    border-radius: 100px;
+    letter-spacing: 0.15px;
+    white-space: nowrap;
+  }
+
+  .empty-state{
+    padding: 46px 20px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .empty-state .empty-title{ font-weight: 700; color: var(--text); margin-bottom: 4px; font-size: 15px; }
+
+  /* ---------- Ficha ---------- */
+  .detail-panel{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 26px 30px 30px;
+    position: sticky;
+    top: 88px;
+  }
+  .detail-empty{
+    padding: 70px 20px;
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 14.5px;
+  }
+  .detail-eyebrow{
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 0.6px;
+    margin-bottom: 8px;
+  }
+  .detail-code{
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--navy);
+    letter-spacing: 0.3px;
+    line-height: 1.15;
+  }
+  .detail-tags{
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .tag-funcionalidad{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 100px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .tag-funcionalidad .func-dot{ width: 10px; height: 10px; }
+  .tag-tipo{ font-size: 12.5px; padding: 5px 12px; }
+
+  hr.detail-divider{ border: none; border-top: 1px solid var(--border); margin: 22px 0 0; }
+
+  .detail-section{ margin-top: 22px; }
+  .detail-section h3{
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 0 8px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+  .cuando-text{
+    color: var(--text);
+    font-size: 14.5px;
+    white-space: pre-line;
+  }
+  .cuando-text.muted{ color: var(--text-faint); }
+
+  .instruccion-box{
+    background: var(--blue-tint);
+    border: 1px solid #CBDEFB;
+    border-left: 4px solid var(--blue);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+  }
+  .instruccion-box.muted{
+    background: var(--bg);
+    border-color: var(--border);
+    border-left-color: var(--border-strong);
+  }
+  .instruccion-text{
+    white-space: pre-line;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .instruccion-text.muted{ color: var(--text-faint); font-weight: 400; }
+  .instruccion-steps{
+    margin: 0;
+    padding-left: 20px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .instruccion-steps li{ margin-bottom: 8px; }
+  .instruccion-steps li:last-child{ margin-bottom: 0; }
+
+  /* ---------- Vista inventario ---------- */
+  .inventory-view{ display: none; }
+  .inventory-intro{
+    color: var(--text-muted);
+    font-size: 13.5px;
+    margin: 0 0 16px;
+    max-width: 720px;
+  }
+  .inventory-list{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 8px;
+  }
+  .inv-row-wrap + .inv-row-wrap{ border-top: 1px solid var(--border); }
+  .inv-row{
+    display: grid;
+    grid-template-columns: 26px 240px 1fr 60px;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 14px;
+    border-radius: var(--radius-sm);
+  }
+  .inv-row-wrap:hover .inv-row{ background: var(--bg); }
+  .inv-dot-cell{ display: flex; justify-content: center; }
+  .inv-name-btn{
+    background: none;
+    border: none;
+    text-align: left;
+    font-weight: 700;
+    color: var(--navy);
+    padding: 8px 0;
+    min-height: var(--tap-min);
+    font-size: 14.5px;
+  }
+  .inv-name-btn:hover{ color: var(--blue-dark); text-decoration: underline; }
+  .inv-count{ font-size: 12px; color: var(--text-muted); margin-top: 1px; font-weight: 500; }
+  .inv-bar-track{
+    background: var(--bg);
+    border-radius: 5px;
+    height: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .inv-bar-fill{ height: 100%; border-radius: 5px 0 0 5px; }
+  .inv-pct{ text-align: right; font-weight: 700; font-size: 13.5px; color: var(--text); }
+
+  .inv-codes{
+    grid-column: 1 / -1;
+    display: none;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 4px;
+    margin-bottom: 6px;
+    padding: 12px 14px;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+  }
+  .inv-codes.open{ display: flex; }
+  .inv-code-chip{
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--navy);
+    min-height: 32px;
+  }
+  .inv-code-chip:hover{ background: var(--blue-tint); border-color: var(--blue); color: var(--blue-dark); }
+
+  .sr-only{
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width: 860px){
+    main{ padding: 14px 12px 34px; }
+    .query-view{ grid-template-columns: 1fr; }
+    .detail-panel{ position: static; }
+    .app-header{ padding: 12px 14px; }
+    .kpi-bar{ padding: 0 14px; }
+    .inv-row{ grid-template-columns: 20px 1fr 46px; }
+    .inv-row .inv-name-cell{ grid-column: 2 / 3; }
+    .inv-row .inv-bar-track{ grid-column: 1 / -1; }
+    body.mobile-detail-open .query-view .search-panel{ display: none; }
+    body:not(.mobile-detail-open) .query-view .detail-panel{ display: none; }
+    .back-to-results{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: var(--blue-dark);
+      font-weight: 700;
+      padding: 10px 0 16px;
+      min-height: var(--tap-min);
+    }
+  }
+  @media (min-width: 861px){
+    .back-to-results{ display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-name">Consubanco</span>
+    <span class="brand-divider" aria-hidden="true"></span>
+    <span class="brand-product">Diccionario operativo de errores PUC</span>
+  </div>
+  <div class="view-tabs" role="tablist" aria-label="Vistas">
+    <button class="view-tab" id="tabConsulta" role="tab" aria-selected="true" aria-controls="viewConsulta">Consulta de errores</button>
+    <button class="view-tab" id="tabInventario" role="tab" aria-selected="false" aria-controls="viewInventario">Inventario por funcionalidad</button>
+  </div>
+</header>
+
+<div class="kpi-bar" id="kpiBar" aria-label="Indicadores del inventario"></div>
+
+<main>
+  <section class="query-view" id="viewConsulta" role="tabpanel" aria-labelledby="tabConsulta">
+    <div class="search-panel">
+      <div class="search-controls">
+        <div class="search-box">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <label for="searchInput" class="sr-only">Buscar código de error</label>
+          <input type="text" id="searchInput" placeholder="Buscar código, por ejemplo: RWPD2" autocomplete="off" aria-describedby="resultsCount">
+          <button class="search-clear" id="searchClear" type="button" aria-label="Limpiar búsqueda">Limpiar</button>
+        </div>
+        <div class="filter-row">
+          <label for="filterFuncionalidad" class="filter-label">Funcionalidad</label>
+          <select id="filterFuncionalidad"></select>
+        </div>
+      </div>
+      <div class="results-meta">
+        <span id="resultsCount" aria-live="polite">275 códigos</span>
+        <button class="clear-filter" id="clearFilterBtn" type="button">Ver todas</button>
+      </div>
+      <button class="back-to-results" id="backToResults" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Volver a resultados
+      </button>
+      <ul class="results-list" id="resultsList" aria-label="Resultados de búsqueda"></ul>
+    </div>
+
+    <div class="detail-panel" id="detailPanel" aria-live="polite" tabindex="-1">
+      <div class="detail-empty">Selecciona un código para consultar su ficha.</div>
+    </div>
+  </section>
+
+  <section class="inventory-view" id="viewInventario" role="tabpanel" aria-labelledby="tabInventario" hidden>
+    <p class="inventory-intro">Distribución de los códigos documentados por funcionalidad. Selecciona una funcionalidad o un código para consultarlo.</p>
+    <div class="inventory-list" id="inventoryList"></div>
+  </section>
+</main>
+
+<script id="records-data" type="application/json">[{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"S8SBS","cuando":"Los clientes no ingresan a la puc en un periodo posterior a la contingencia debido a que no están en el directorio activo.\n(Esto sucede cuando intentan ingresar)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Durante la llamada, solicitar al cliente se enrole de nuevo"},{"categoria":"Inicio de sesión / Enrolamiento","tipo":"Técnico","codigo":"E12A8","cuando":"Usuarios sin Client ID no pueden enrolarse o iniciar sesión","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Durante la llamada, solicitar al cliente se enrole de nuevo"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"40KXP","cuando":"Cuando el cliente intenta hacer una transferencia","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Durante la llamada, solicitar al cliente intente nuevamente la operación"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"RWPD2","cuando":"Cuando el cliente intenta iniciar sesión y la app Consubanco (PUC) no está disponible debido a una falla en los servicios de integraciones.","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción para que el cliente vuelva a intentarlo"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"T94W3","cuando":"Cuando hay intermitencias con el proveedor del token (VU). Validación de token vencido","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que intente realizar la operación de nuevo"},{"categoria":"Act. Teléfono en Enrolamiento","tipo":"Técnico","codigo":"U5CKR","cuando":"Surge cuando se modifica el teléfono durante el enrolamiento y al momento de detonar la confirmación por correo algo sucede que detona error.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Continúa enrolamiento"},{"categoria":"Login/ Enrolamiento","tipo":"Técnico","codigo":"5VXBU","cuando":"Cuando el cliente no cuenta con Client ID y marca error al crear su contraseña","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Durante la llamada, solicitar al cliente se enrole de nuevo"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"9X567","cuando":"Cuando el cliente no cuenta con Client ID y se interrumpe el registro","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Continúa enrolamiento"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"ITXPJ","cuando":"Cuando se intenta transferir a una institución que cambio de razón social y el catálogo no fue actualizado en CRM (ej. Lo que vivimos con NU)","instruccion":"1. ATC. debe levantar ticket\n2. Niveles 1 y 2, notificar a los equipos correspondientes para que sea revisado y atendido (Act. de catálogos)\n3. Solicitar al cliente que espere la respuesta"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"TEA0K","cuando":"Falla de T-OTP (Token UV). El token cuando llega al canal esta expirado","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicita al cliente que reintente la operación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"P0ZZD","cuando":"Cuando el cliente intenta hacer el proceso de registro (enrolamiento) y no tiene un teléfono asociado en CRM","instruccion":"1. ATC debe levantar un ticket en el CAI para que se haga la actualización del teléfono\n2. El CAI actualiza teléfono\n3. ATC solicita al cliente que reintente"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"MTRZX","cuando":"Cuando el usuario intenta realizar su proceso de registro y hay una falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"TXJ6K","cuando":"Cuando el usuario intenta realizar una transferencia y hay una falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Regla de negocio","codigo":"NO9VE","cuando":"Cuando el usuario intenta realizar su proceso de registro y hay una falla interna - error en comunicación de servicios","instruccion":"1. ATC debe realizar los filtros correspondientes para asegurar que el dispositivo es del usuario\n2. Levantar el ticket en slack para que el Niveles 1 y 2 hagan el proceso de desvinculación"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"E3RPQ","cuando":"Cuando el usuario ingresa a la app, intenta realizar una transferencia pero la cuenta destino (beneficiario) no aparece a nivel sistemas o tiene algún estatus eliminado","instruccion":"1. ATC debe realizar los filtros correspondientes para asegurar que el dispositivo es del usuario\n2. Levantar el ticket en slack para que el Niveles 1 y 2 y se revise con los equipos correspondientes cual es el problema en particular."},{"categoria":"Ver cuenta débito","tipo":"Técnico","codigo":"12VP1","cuando":"Cuando el usuario ingresa a la app, selecciona ver el detalle de alguna de sus cuentas, y esta, tiene algún estatus inactivo, bloqueado etc.","instruccion":"1. ATC debe levantar un ticket\n2. Niveles 1 y 2 escalan el caso con las áreas correspondientes y regresan con respuesta\n3. ATC notifica al usuario estatus"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"L4Z7I","cuando":"Cuando el cliente intenta hacer el proceso de registro (enrolamiento) y no tiene un teléfono asociado en CRM","instruccion":"1. ATC debe levantar un ticket en el CAI para que se haga la actualización del teléfono\n2. El CAI actualiza teléfono\n3. ATC solicita al cliente que reintente\""},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"1BTBT","cuando":"Cuando el cliente intenta hacer el proceso de registro (enrolamiento) y no tiene un teléfono asociado en CRM","instruccion":"1. ATC debe levantar un ticket en el CAI para que se haga la actualización del teléfono\n2. El CAI actualiza teléfono\n3. ATC solicita al cliente que reintente\""},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"36TTZ","cuando":"Cuando el cliente intenta realizar un inicio de sesión en PUC (Login) arroja error si su número ha cambiado mediante algún otro proceso a través del CAI y en PUC no se hace la actualización del mismo","instruccion":"1. ATC debe levantar un ticket en Slack.\n2. Nivel 2 realiza la actualización del teléfono dentro de las bases de la PUC.\n3. ATC solicita al cliente que intente nuevamente."},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"C4FON","cuando":"Cuando el cliente no cuenta con Client ID y marca error al crear su contraseña","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Durante la llamada, solicitar al cliente se enrole de nuevo"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"6VM5R","cuando":"Cuando el cliente intenta cambiar su número de teléfono y excede el número de intentos.","instruccion":"1. ATC debe levantar un ticket con el CAI\n2. El CAI realiza cambio de teléfono\n3. ATC informa al cliente que acceda nuevo"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"840CK","cuando":"El cliente no realiza actualización del aplicativo e intenta acceder con una versión desactualizada/anterior","instruccion":"1. ATC debe levantar un ticket\n2. Se le solicita al cliente que acceda a la tienda de su dispositivo móvil (IOS/Android) y actualice la aplicación"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"5PNLU","cuando":"Se busca el número de teléfono del cliente y no se localiza (ingresa con un teléfono no registrado o no se encuentra almacenado en CRM)","instruccion":"1. ATC debe levantar un ticket\n2. Se le solicita al cliente se registre de nuevo, cambie su contraseña y acceda nuevamente a la aplicación"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"79OO9","cuando":"Cuando el cliente intenta acceder a la aplicación pero la contraseña es erronea (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket\n2. Se le solicita al cliente que reintente ingresar con su contraseña"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"ECOXD","cuando":"El cliente cambiar la contraseña de su aplicación, ingresa y al entrar inválida la sesión","instruccion":"1. ATC debe levantar un ticket\n2. Se le solicita al cliente cierre su aplicación e ingrese nuevamente"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"N0X9M","cuando":"El cliente realizar la transferencia, el aplicativo indica que no se pudo obtener el nombre del tercero (Por ejemplo: cuenta previamente eliminada)","instruccion":"1. ATC debe levantar un ticket\n2. Se le solicita se elimine el contacto y lo dé de alta nuevamente"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"CSJ6S","cuando":"Falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"FWDKW","cuando":"Falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Solicitud TDD","tipo":"Técnico","codigo":"4AX7M","cuando":"Cuando el cliente ingresa a la PUC e intenta solicitar una tarjeta de débito nivel 2 (BKY)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se indica al cliente que la reposición debe solicitarla desde el aplicativo de BKY"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"IFHLX","cuando":"Cuando el usuario intenta realizar su proceso de registro y hay una falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"OGFR4","cuando":"Cuando el usuario intenta realizar su proceso de registro y hay una falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"9TG53","cuando":"Cuando el usuario intenta realizar su proceso de registro y hay una falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Créditos","tipo":"Técnico","codigo":"HO5WR","cuando":"Falla al momento de activar un crédito, indica la solicitud no puede ser confirmada","instruccion":null},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"J1UT4","cuando":"El cliente se encuentra bloqueado en CRM","instruccion":"1. Subir ticket con el equipo del CAI para que gestionen el desbloqueo.\n2. El CAI confirma desbloqueo y cliente puede enrolarse"},{"categoria":"Inicio de sesión","tipo":"Usuario","codigo":"SH578","cuando":"El error indica que el cliente intenta ingresar una contraseña incorrecta","instruccion":"1. ATC deberia indicar que verifique la contraseña que intenta ingresar."},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"NOOSP","cuando":"Falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"50C9E","cuando":"Falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"HK456","cuando":"Falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"HUERQ","cuando":"El error indica que la cuenta una vez dada de alta se podrá utilizar en 30 min","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le indica al cliente que la cuenta se podrá utilizar en 30 min."},{"categoria":"Notificaciones","tipo":"Técnico","codigo":"UA21N","cuando":"El error indica que al momento de ingresar al apartado de notificaciones este no encuentra el CustomerID","instruccion":"1. ATC debe levantar un ticket.\n2. Revisar el caso del lado del N2, para ver si es que el cliente no se encuentra en la BD o algo le pasa"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"XZ7EH","cuando":"Falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"2HH36","cuando":"Falla interna - error en comunicación de servicios","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"9CMV5","cuando":"Cuando el cliente intenta hacer el proceso de registro (enrolamiento) y no tiene un teléfono asociado en CRM","instruccion":"1. ATC debe levantar un ticket en el CAI para que se haga la actualización del teléfono\n2. El CAI actualiza teléfono\n3. ATC solicita al cliente que reintente"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"GV8V2","cuando":"Cuando el cliente intenta hacer una transferencia y hay intermitencias con el proveedor del token (VU). Validación de token vencido","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que intente realizar la operación de nuevo"},{"categoria":"Cuentas","tipo":"Técnico","codigo":"JT71V","cuando":"El error se presenta cuando se quiere tomar los estados de cuenta","instruccion":"1. ATC debe levantar un ticket.\n2. Se revisa si el cliente tiene cuentas en el N2"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"50BEH","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Transferencias","tipo":"Usuario","codigo":"H9G88","cuando":"Cuando el cliente, intenta hacer una transferencia y su cuenta eje tiene saldo insuficiente.","instruccion":"1. ATC debe indicarle al cliente que no cuenta con saldo suficiente."},{"categoria":"Créditos","tipo":"Técnico","codigo":"S5FAP","cuando":"Cuando el cliente intenta visualizar detalle de su crédito, el servicio no responde, por lo cual no se refleja la información de este","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción que el cliente vuelva a reintentar"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"3O6B0","cuando":"Cuando el cliente desea realizar un cambio de contraseña, sin embargo, el tiempo de respuesta del servicio es prolongado","instruccion":"1. Levantar un ticket\n2. El cliente debe reintentar su cambio de contraseña sin tardar demasiado en hacerlo."},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"PU5VO","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Crédito- Tabla de amortización","tipo":null,"codigo":"3VZ55","cuando":"Cuando el cliente desea consultar su tabla de amortización, no lo puede visualizar y arroja el error: \"CostumerNotFound\"","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. 1 ATC debe informar al usuario que puede realizar la act. desde el perfil del cliente (nombre del usuario/ por donde está el avatar)"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"EVUKK","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"OC6I6","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"9ZHSC","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"D7OLI","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":null,"tipo":"Técnico","codigo":"LDNKK","cuando":"Este error sucede en la funcionalidad de Tarjeta de débito, al momento de que el usuario intenta hacer una reposición","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. N1/ N2 escalan con el área correspondiente (Core)\n3. Esperar respuesta a través del ticket para que el cliente pueda hacer su reposición"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"QXP10","cuando":"Ocurre cuando el cliente inicia sesión y surge una falla en el login (existe falla de comunicación entre servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"MC1CQ","cuando":"Ocurre cuando el cliente inicia sesión y surge una falla en el login (existe falla de comunicación entre servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte"},{"categoria":null,"tipo":"Técnico","codigo":"S7VTI","cuando":"Ocurre cuando el cliente inicia sesión y surge una falla en el login (existe falla de comunicación entre servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"WXK7G","cuando":"El cliente no realiza actualización del aplicativo e intenta acceder con una versión desactualizada/anterior","instruccion":"1. ATC debe levantar un ticket\n2. Se le solicita al cliente que acceda a la tienda de su dispositivo móvil (IOS/Android) y actualice la aplicación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"XDFXM","cuando":"Ocurre cuando el cliente inicia sesión y surge una falla en el login (existe falla de comunicación entre servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte"},{"categoria":"Enrolamiento","tipo":"Regla de negocio","codigo":"3X6A3","cuando":"Cuando el usuario intenta realizar su proceso de registro y hay una falla interna - error en comunicación de servicios","instruccion":"1. ATC debe realizar los filtros correspondientes para asegurar que el dispositivo es del usuario\n2. Levantar el ticket en slack para que el Niveles 1 y 2 hagan el proceso de desvinculación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"6IV06","cuando":"Ocurre cuando el cliente inicia sesión y surge una falla en el login (existe falla de comunicación entre servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"BNSI5","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"NV9G7","cuando":"Ocurre cuando el cliente inicia sesión y surge una falla en el login (existe falla de comunicación entre servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"S4OKS","cuando":"El cliente ingresa a su aplicativo con su usuario y/o contraseña, pero alguno de estos es erroneo.","instruccion":"1. ATC debe levantar un ticket.\n2. Se solicita al cliente coloque la contraseña correcta o realice el cambio"},{"categoria":"Transversal","tipo":"Técnico","codigo":"60LFZ","cuando":"Cuando el usuario realiza alguno de los procesos que requiere OTP para confirmación de teléfono y el servicio no responde","instruccion":"1. ATC debe levantar un ticket.\n2. Se solicita al cliente volver a reintentar o esperar la confirmación"},{"categoria":"Navegación dentro de la app","tipo":"Regla de negocio","codigo":"8S7WV","cuando":"El usuario accede a la aplicación, navega y se va sin cerrar sesión. Cuando intenta retomar le arroja el modal \"se cerro sesión por inactividad\" y se contabiliza el código de error, no ve un error.","instruccion":"1. ATC debe levantar un ticket.\n2. Debe cerrar todas las aplicaciones abiertas en el dispositivo e intentar volver a ingresar"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"C9CU3","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":null,"tipo":null,"codigo":"OGI0R","cuando":"El usuario intenta acceder a su acuenta sin embargo, le indica que este dispositivo se encuentra asociado a otro cliente","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en slack para su atención N1-N2\n3. Esperar respuesta por el equipo soporte"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"RVD58","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"ZMTUL","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Inversiones","tipo":"Técnico","codigo":"IQ8RJ","cuando":"El usuario ingresa al aplicativo, intenta visualizar inversiones pero no arroja información","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Contacta al equipo de ICBS/Core bancario\n3. Se le solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"19ZMW","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"9347O","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"PXJZG","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Acceso a la APP","tipo":"Técnico","codigo":"VJTSM","cuando":"Ocurre cuando el cliente intente acceder a la app, selecciona el icono y antes de hacer lolgin genera error (existe falla de comunicación entre servicios)","instruccion":null},{"categoria":"Acceso a la APP","tipo":"Técnico","codigo":"1NC78","cuando":"Ocurre cuando el cliente intente acceder a la app, selecciona el icono y antes de hacer lolgin genera error (existe falla de comunicación entre servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte (tema asociado a disponibilidad de los servicios de la app)"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"405SL","cuando":"Ocurre cuando el cliente intente acceder a la app, selecciona el icono y antes de hacer lolgin genera error (existe falla de comunicación entre servicios)→ mapeo de tarjetas","instruccion":null},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"DRXD7","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"H269U","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"KGBRM","cuando":"Usuarios sin Client ID no pueden enrolarse o iniciar sesión","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Durante la llamada, solicitar al cliente se enrole de nuevo"},{"categoria":"Transversal","tipo":"Técnico","codigo":"5Q83D","cuando":"Se encuentra relacionado con diversos flujos cada que eel cliente desea actualizar su cuenta de correo electrónico","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte N1-N2"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"5QBMI","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Créditos","tipo":"Técnico","codigo":"8XF1O","cuando":"Cuando el cliente intenta visualizar detalle de su crédito, el servicio no responde, por lo cual no se refleja la información de este","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción para que el cliente vuelva a intentarlo"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"9WFRL","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"EPPZO","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Regla de negocio","codigo":"JH4PC","cuando":"Cuando el cliente registra un correo electrónico, sin embargo, este no se registra y el sistema indica que este se encuentra asociado a otro cliente.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta del equipo de soporte N1-N2"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"MS442","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"PRQDS","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"QM7N1","cuando":"Cuando se está haciendo una consulta interna de buró telefonico y el servicio no responde","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte N1-N2"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"VALC7","cuando":"Cuando el cliente realiza una transferencia pero esta es rechazada","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se escala con el equipo CORE\n3. Se le solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"XMJ9O","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"8DZIG","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":null,"tipo":null,"codigo":"A75H9","cuando":"Cuando el cliente accede a su aplicativo, sin embargo, el aplicativo informa que su sesión ha expirado","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte N1-N2"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"C2W1X","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"SGNNL","cuando":"Cuando el cliente accede a su aplicativo, desea realizar una transferencia, sin embargo, el aplicativo informa que su sesión ha expirado","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Indicarle al cliente cierre sesión y/o salga del aplicativo e ingrese de nuevo"},{"categoria":null,"tipo":null,"codigo":"UJFSI","cuando":"Cuando el cliente se registra, ingresa el CURP, y al registrarse aparecen dos registros similares/coincidentes","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte N1-N2\n3. Se le comenta al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"UZ0GR","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"X1CJ6","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Home","tipo":"Técnico","codigo":"X9RGT","cuando":null,"instruccion":null},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"XAR19","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Tarjeta de débito","tipo":"Técnico","codigo":"XFF4H","cuando":"Cuando el cliente intenta solicitar una reposición de TDD y no cuenta con un correo electrónico / número telefónico asociado o erroneo y ocurre una falla durante el proceso.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se contacta al equipo técnico correspondiente para que proporcione respuesta de la solicitud\n3. Se le informa al cliente que espere respuesta para reintentar"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"1ONPO","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"4955R","cuando":"El cliente desea realizar una transferencia, sin embargo, al momento de realizarla arroja un error en la validación del usuario que desea realizar la operación","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que realice nuevamente la transferencia (ya que este ocurrió por una intermitencia en el sistema)"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"DNNMQ","cuando":"SIN INFORMACIÓN","instruccion":null},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"VI774","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"XT9FM","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Créditos","tipo":"Técnico","codigo":"E8VW9","cuando":"No visualiza información del crédito en CRM","instruccion":"\"1. ATC debe levantar un ticket para que se contabilice\n2. Se escala con el equipo de CRM\n3. Se le indica al cliente espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"H2MBI","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"NXIER","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"U6U28","cuando":"Cuando se está haciendo una consulta interna de buró telefonico y este se encuentra asociado a otro cliente","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket con el equipo del CAI\n3. El CAI indica el procedimiento a seguir\n4. Se le informa al cliente el proceso a seguir"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"UTHG3","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"461C9","cuando":"Cuando el cliente realiza su registro, sin embargo, arroja error por una intermitencia. Lo intenta nuevamente y completa el registro","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente se reintente el registro dos días después de la falla para concluir el registro"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"6SD6B","cuando":"Cuando el cliente accede a su aplicativo, desea realizar una transferencia, sin embargo, el aplicativo informa que su sesión ha expirado","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Indicarle al cliente cierre sesión y/o salga del aplicativo e ingrese de nuevo"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"9XJM6","cuando":"El cliente realiza cambio de contraseña y ocurre una falla en la validación biométrica","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que realice nuevamente la operación"},{"categoria":"Tarjeta de débito","tipo":"Técnico","codigo":"E8PNS","cuando":"El cliente desea realizar una reposición de tarjeta, sin embargo, el servicio no responde","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que realice nuevamente la operación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"EH5VK","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Monedero Chedraui**","tipo":"Técnico","codigo":"I94GB","cuando":"Cuando el cliente consulta sus cuentas para poder activar su monedero Chedraui","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se envía la solicitud al equipo correspondiente (integraciones) y se espera respuesta\n3. Se le solicita al cliente que espere respuesta para reintentar"},{"categoria":"Tarjeta de débito","tipo":"Técnico","codigo":"SPTWT","cuando":"El cliente desea realizar su consulta de NIP sin embargo, hay un error y no se permite visualizar este","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se envía la solicitud al equipo correspondiente (integraciones) y se espera respuesta\n3. Se le solicita al cliente que espere respuesta para reintentar"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"W59FU","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"0VK6X","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"3DHI3","cuando":"El cliente realizar dos transferencias con la misma referencia","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que realice la operación con una referencia distinta"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"49OT8","cuando":"El cliente realiza una transferencia sin embargo el movimiento es rechazado","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Los equipos correspondientes revisarán el motivo de rechazo\n3. Se le solicita al cliente que espere respuesta para volver a reintentar la operación"},{"categoria":"Tarjeta de débito","tipo":"Técnico","codigo":"7MIKI","cuando":"Cuando el cliente tiene su nueva tarjeta e intenta asociarla a su aplicativo, sin embargo arroja un error ya que el BAF es diferente/incorrecto","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Levantan ticket a través de slack para que el equipo del CORE lo atienda\n3. Se le proporciona respuesta al cliente"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"ABEDK","cuando":"El cliente no puede acceder a su aplicativo","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket a través de slack\n3. Se le indica al cliente espere respuesta para intentar nuevamente"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"AV7XQ","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Portabilidad","tipo":"Técnico","codigo":"BJAJF","cuando":"Cuando el cliente no puede visualizar si tiene una portabilidad activa o fue rechazada","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en slack\n3. Se le informa al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"HWZV7","cuando":"Cuando el cliente desea realizar su enrolamiento, sin embargo, hay información duplicada","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"IKP8T","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"JLXLS","cuando":"El cliente intenta realizar su enrolamiento, sin embargo, al llevar a cabo la validación el servicio no responde (Falla interna - error en comunicación de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Monedero Chedraui**","tipo":"Técnico","codigo":"KEM09","cuando":"Cuando el cliente consulta sus cuentas para poder activar su monedero Chedraui","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se envía la solicitud al equipo correspondiente (integraciones) y se espera respuesta\n3. Se le solicita al cliente que espere respuesta para reintentar"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"QN0PJ","cuando":"Hay una validación de OTP en el proceso y este está expirado","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente el registro omitiendo el error"},{"categoria":"Portabilidad","tipo":"Técnico","codigo":"SRDQS","cuando":"Cuando el cliente no puede visualizar si tiene una portabilidad activa o fue rechazada","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en slack\n3. Se le informa al cliente que espere respuesta"},{"categoria":"Enrolamiento / Inicio de sesión","tipo":"Técnico","codigo":"0ADMD","cuando":"Error al validar patrón de seguridad en OTP","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que reintente la operación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"3D04O","cuando":"Se presenta el error debido a que se hace la consulta a la información del cliente (en CRM) y este no muestra datos","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en slack para canalizarlo al equipo correspondiente\n3. El equipo encargado deberá regresar respuesta del porqué ocurrió el error\n4. Se le proporciona respuesta al cliente"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"6E2X5","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"7NDMZ","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Transversal","tipo":"Técnico","codigo":"953CV","cuando":"Cuando el cliente desea hacer una actualización de datos o activación de token, sin embargo, excede el número máximo de intentos por biometría, motivo por el cual, debe esperar 30 minutos para reintentar la operación (Este error debe parametrizarse con la Celula)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente esperar 30 minutos y volver a intentar"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"9QRCQ","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Transversal","tipo":"Técnico","codigo":"B6OL5","cuando":"Cuando el cliente desea realizar la apertura de una cuenta, actualizar datos o activación de token, sin embargo, ocurre una falla inesperada la cual deriva de una intermitencia con el proveedor biométrico.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Informar al proveedor de la falla ocurrida e informar al equipo correspondiente para que reintenten la operación\n3. Solicitar al cliente que espere la respuesta para reintentar la operación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"D6MM7","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Crédito- Tabla de amortización","tipo":"Técnico","codigo":"LTNF8","cuando":"Cuando el cliente desea obtener información en tabla de amortización de crédito","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en slack para que se escale con el equipo correspondiente\n3. Solicitar al cliente que espere la respuesta de la atención para obtener su tabla de amortización"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"LZZZG","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"M9SFK","cuando":"El cliente desea realizar una transferencia a otros bancos, sin embargo, arroja mensaje de error","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar nuevamente la operación"},{"categoria":"Inversiones","tipo":"Técnico","codigo":"NUQ7E","cuando":"Cuando el cliente desea descargar su constancia de inversión y el aplicativo arroja un error","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para que pueda realizar la descarga de su constancia"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"P4G31","cuando":"Cuando el cliente desea realizar una transferencia en un horario posterior a las 6pm, por lo cual el sistema bloqueará la transferencia si rebasa el monto transferido","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le indica el monto que puede transferir y aclarar porque sucede"},{"categoria":"Servicios","tipo":"Técnico","codigo":"SO4O4","cuando":"Ocurre cuando hay una intermitencia interna en la comunicación en los servicios PUC","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"ZXZHS","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Inversiones","tipo":"Técnico","codigo":"2D8IM","cuando":"Cuando el cliente desea realizar una inversión desde su aplicación, sin embargo, su saldo es insuficiente","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta de la atención"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"38B43","cuando":"Ocurre cuando hay una intermitencia interna en la comunicación en los servicios PUC","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"3O0T3","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"3PVDA","cuando":"Cuando el cliente está enrolandose y al registrar el correo no le permite continuar con el registro (este ya lo tiene registrado otro usuario)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita acuda al CAI para realizar la modificación del correo, esperar respuesta de la atención o intentar con email propio del cliente (acorde al caso indicado por el cliente)"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"4466J","cuando":"Cuando el cliente se ha registrado previamente y desea intentarlo de nueva cuenta y la aplicación arroja error","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. ATC debe levantar un ticket en slack.\n3. El equipo atiende el incidente\n4. Se le proprociona respuesta al cliente"},{"categoria":"Créditos","tipo":"Técnico","codigo":"7EIQF","cuando":"Falla en la comunicación de crédito","instruccion":"1. ATC debe levantar un ticket.\n2. Se solicita al cliente esperar respuesta para reintentar la operación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"7WWA5","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"AWRMM","cuando":"Cuando el cliente está enrolandose y al registrar el correo no le permite continuar con el registro (este ya lo tiene registrado otro usuario)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita acuda al CAI para realizar la modificación del correo, esperar respuesta de la atención o intentar con email propio del cliente (acorde al caso indicado por el cliente)"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"C1PCK","cuando":"Derivado de una intermitencia interna en la comunicación en los servicios PUC","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le indica al cliente que le proporciona respuesta en cuando se haya solventado la falla"},{"categoria":"Home","tipo":"Técnico","codigo":"EP5T6","cuando":"Cuando el cliente desea ingresar al aplicativo y no le permite visualizar sus productos, automáticamente el sistema arroja un error (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket.\n2. Se solicita al cliente esperar respuesta para reintentar la visualización"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"H1JFD","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"KH78F","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"KM73J","cuando":"Derivado de una intermitencia interna en la comunicación en los servicios PUC","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le indica al cliente que le proporciona respuesta en cuando se haya solventado la falla"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"ME9KF","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"O7SHA","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"OUKWN","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"TCUJO","cuando":"Cuando desea realizar la actualización de su teléfono de contacto, sin embargo, esté lo posee otro cliente (un tercero)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se revisa caso con el CAI\n3. Si el CAI lo determina, se levanta el ticket en slack\n4. El equipo correspondiente debe analizar el caso\n5. Se le solicita al cliente que espere respuesta"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"VAHTP","cuando":"Cuando el cliente desea realizar una transferencia sin embargo le arroja error (este deriva de una intermitencia interna)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar la operación"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"VJ22F","cuando":"Cuando el cliente desea realizar una transferencia similar realizada (Ejemplo: un pago doble de servicios)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita verifique si efectivamente desea realizar una transferencia similar y en caso de ser afirmativo, se solicita cambiar la referencia"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"VLIMC","cuando":"Cuando desea realizar una transferencia, sin embargo, no cuenta con un saldo suficiente en la cuenta","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita verifique el saldo de la cuenta, en caso de contar con este, deberá de escalarse con el equipo correspondiente"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"ZGTJH","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"01HO6","cuando":"Cuando el cliente registra cuentas en su aplicativo de la PUC, estas son visibles en la PUC.\nSin embargo, cuando alguna es eliminada de BKY sigue siendo visible en el aplicativo de CSB.\nMotivo por el cual, al realizar una transferencia en la PUC a la cuenta eliminada, está no se puede realizar","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente que elimine el contacto y lo registre nuevamente"},{"categoria":"Transversal","tipo":"Técnico","codigo":"15S8G","cuando":"Cuando el cliente desea realizar la apertura de una cuenta, actualizar datos o activación de token, sin embargo, ocurre una falla inesperada la cual deriva de una intermitencia con el proveedor biométrico.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Informar al proveedor de la falla ocurrida e informar al equipo correspondiente para que reintenten la operación\n3. Solicitar al cliente que espere la respuesta para reintentar la operación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"1SA6I","cuando":"El cliente desea acceder al aplicativo, sin embargo, derivado de intermitencias con este, el cliente no puede realizar dicho acceso","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al CAI realice desbloqueo para que el cliente acceda a su aplicativo\n3. Se le proporciona respuesta al cliente"},{"categoria":"Transversal","tipo":"Técnico","codigo":"26E0P","cuando":"Cuando el cliente desea realizar la apertura de una cuenta, actualizar datos o activación de token, sin embargo, ocurre una falla inesperada la cual deriva de una intermitencia con el proveedor biométrico.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Informar al proveedor de la falla ocurrida e informar al equipo correspondiente para que reintenten la operación\n3. Solicitar al cliente que espere la respuesta para reintentar la operación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"2LZDV","cuando":"Cuando un cliente quiere registrarse con una CURP pero este ya esta usado por otro usuario","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al CAI elimine el CURP duplicado, asimimo, se solicita se realice esta misma operación con el equipo de soporte N2.\n3. Le informan al cliente reinte registro"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"3587Z","cuando":"El cliente desea una transferencia, sin embargo, derivado de intermitencias con el aplicativo, el cliente no puede realizar dicha operación","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al equipo N1/N2 apoyo para revisar la incidencia\n3. Se le solicita al cliente se le proporcione respuesta para intentar realizar nuevamente la operación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"3SL23","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"3WZCX","cuando":"El cliente desea acceder al aplicativo, sin embargo, derivado de intermitencias con este, el cliente no puede realizar dicho acceso","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al CAI realice desbloqueo para que el cliente acceda a su aplicativo\n3. Se le proporciona respuesta al cliente"},{"categoria":null,"tipo":null,"codigo":"60IW4","cuando":"Falla del token (no se especifica en que apartado)","instruccion":null},{"categoria":"Tarjeta de débito","tipo":"Técnico","codigo":"6DUUG","cuando":"Cuando el cliente realiza solicitud de TDD y la aplicación arroja error, motivo por el cual la tarjeta no se puede obtener","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente esperar respuesta para reintentar el proceso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"6IGHV","cuando":"El cliente desea registrarse en el aplicativo, sin embargo, ocurre una intermitencia durante el proceso.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que reintente realizar nuevamente el proceso"},{"categoria":"Enrolamiento","tipo":"Regla de negocio","codigo":"6MD4O","cuando":"Cuando el cliente realiza su enrolamiento, sin embargo, no concluye el proceso en un lapso de 30 días (desde que comienza el proceso), motivo por el cual se realiza un bloqueo automático","instruccion":"1. ATC debe levantar\n2. Se solicita desbloqueo con el equipo del CAI\n3. Se le indica al cliente reintente acceder"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"7WVQE","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Tarjeta de débito","tipo":"Técnico","codigo":"7XS75","cuando":"Cuando el cliente quiere realizar la activación de su TDD sin embargo, el aplicativo no permite la asociación de la tarjeta y por ende, no puede continuar con este proceso","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se escala con el equipo N1/N2 (según corresponda)\n3. Se solicita al cliente que espere respuesta para reintentar el proceso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"85DBE","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"87BAK","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Inversiones","tipo":"Técnico","codigo":"8TFZV","cuando":"Al momento de que se quieren ver el detalle de las inversiones este falla por parte de un servicio externo y el cliente no puede ver ese detalle","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en Slack para escalar\n3. Se escala con equipo correspondiente N1/N2\n4. Se solicita al cliente que espere respuesta para reintentar el proceso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"948J1","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Tarjeta de débito","tipo":"Técnico","codigo":"94DTS","cuando":"Cuando el cliente tiene dos cuentas (tanto N4 - CSB como N2 - Bky) y solicita la reposición de su TDD CSB (N4), esta no se puede cambiar en sistema (REVISAR INCIDENCIA)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en Slack para escalar\n3. Se escala con equipo correspondiente N1/N2\n4. Se solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"ANK5C","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Créditos","tipo":"Técnico","codigo":"APEK9","cuando":"Cuando el cliente intenta visualizar detalle de su crédito, el servicio no responde, por lo cual no se refleja la información de este","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción para que el cliente vuelva a intentarlo"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"AWZ25","cuando":"Cuando el cliente captura su CURP (durante su registro) y guarda esta información, el aplicativo arroja un error (ya que probablemente se tuvo una intermitencia)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta en ticket a traves de Slack y se escala con equipo correspondiente\n3. Se solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"B0XAL","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"B3FUH","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"B51EI","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"BBKD9","cuando":"Cuando el cliente inicia sesión en un dispositivo nuevo, y el aplicativo arroja error","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en slack para su atención N2\n3. Se le solicita al cliente documento \"Pertenencia dispositivo\" e \"INE\"\n4. Equipo N2 realiza gestión correspondiente\n5. Se le informa al cliente se puede enrolar al nuevo dispositivo"},{"categoria":"Enrolamiento","tipo":"Negocio","codigo":"BRJIB","cuando":"El usuario intenta acceder a su acuenta sin embargo, le indica que este dispositivo se encuentra asociado a otro cliente","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en slack para su atención N1-N2\n3. Esperar respuesta por el equipo soporte"},{"categoria":"Enrolamiento","tipo":"Usuario","codigo":"C9MED","cuando":"Cuando el ciente está realizando la captura del número de teléfono y deja espacios en la captura de estos (Ejemplo: 55 5555 5555) y al guardar, arroja un mensaje de error","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Levanta ticket para que el CAI realice la actualización del teléfono\n3. ATC solicita al cliente que reintente la captura del teléfono"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"CDMAJ","cuando":"El cliente desea acceder al aplicativo, sin embargo, derivado de intermitencias con este, el cliente no puede realizar dicho acceso","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al CAI realice desbloqueo para que el cliente acceda a su aplicativo\n3. Se le proporciona respuesta al cliente"},{"categoria":"Crédito- Tabla de amortización","tipo":"Técnico","codigo":"CITFP","cuando":"Cuando el cliente desea descargar el PDF, el cual contiene información de la tabla de amortización de crédito","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en slack para que se escale con el equipo correspondiente\n3. Solicitar al cliente que espere la respuesta de la atención para obtener su tabla de amortización"},{"categoria":"Inversiones","tipo":"Técnico","codigo":"D2P3C","cuando":"El usuario ingresa al aplicativo, intenta visualizar inversiones pero no arroja información","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al cliente esperar respuesta para reintentar el proceso"},{"categoria":"Créditos","tipo":"Técnico","codigo":"D3D0C","cuando":"Cuando el cliente intenta visualizar detalle de su crédito, el servicio no responde, por lo cual no se refleja la información de este","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción para que el cliente vuelva a intentarlo"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"DVHU3","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"E3WT9","cuando":"El cliente desea acceder al aplicativo, sin embargo, derivado de intermitencias con este, el cliente no puede realizar dicho acceso","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al CAI realice desbloqueo para que el cliente acceda a su aplicativo\n3. Se le proporciona respuesta al cliente"},{"categoria":"Transversal","tipo":"Técnico","codigo":"EETHJ","cuando":"Cuando el cliente desea realizar la apertura de una cuenta, actualizar datos o activación de token, sin embargo, ocurre una falla inesperada la cual deriva de una intermitencia con el proveedor biométrico.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Informar al proveedor de la falla ocurrida e informar al equipo correspondiente para que reintenten la operación\n3. Solicitar al cliente que espere la respuesta para reintentar la operación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"EL379","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"F2WUG","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"GMMCT","cuando":"Cuando el dispositivo del cliente presenta una configuración manual de la zona horaria","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que configure la zona horaria de su dispositivo móvil (de forma automática) para que pueda realizar la transferencia"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"H3IUX","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"H48LI","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"HJ9LG","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"HXCMQ","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"IJ6MO","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"IQFEF","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"IVQW1","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"JDJXU","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"JLJ93","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"K0PT8","cuando":"Se presenta el error debido a que se hace la consulta a la información del cliente (en CRM) y este no muestra datos","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en slack para canalizarlo al equipo correspondiente\n3. El equipo encargado deberá regresar respuesta del porqué ocurrió el error\n4. Se le proporciona respuesta al cliente"},{"categoria":"Home","tipo":"Técnico","codigo":"K3R9M","cuando":"Cuando el cliente quiere visualizar los productos contratados, sin embargo, le arroja error","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte N1-N2\n3. Se le comenta al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"KOHMH","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"KT61S","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Transversal","tipo":"Técnico","codigo":"L41Z3","cuando":"Cuando el cliente desea realizar la apertura de una cuenta, actualizar datos o activación de token, sin embargo, ocurre una falla inesperada la cual deriva de una intermitencia con el proveedor biométrico.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Informar al proveedor de la falla ocurrida e informar al equipo correspondiente para que reintenten la operación\n3. Solicitar al cliente que espere la respuesta para reintentar la operación"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"LR8DP","cuando":"El cliente desea acceder al aplicativo, sin embargo, derivado de intermitencias con este, el cliente no puede realizar dicho acceso","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se solicita al CAI realice desbloqueo para que el cliente acceda a su aplicativo\n3. Se le proporciona respuesta al cliente"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"LZHBU","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"M1DOH","cuando":"El cliente realiza actualización de su número, y al validar esta operación con biometría, arroja error.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. El equipo técnico N2 revisa el caso\n3. Se le solicita al cliente que espere respuesta para reintentar proceso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"M2PO9","cuando":"Cuando el cliente desea realizar la apertura de una cuenta, actualizar datos o activación de token, sin embargo, ocurre una falla inesperada la cual deriva de una intermitencia con el proveedor biométrico.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Informar al proveedor de la falla ocurrida e informar al equipo correspondiente para que reintenten la operación\n3. Solicitar al cliente que espere la respuesta para reintentar la operación"},{"categoria":"Transversal","tipo":"Técnico","codigo":"MB18Q","cuando":"Cuando el cliente desea realizar la apertura de una cuenta, actualizar datos o activación de token, sin embargo, ocurre una falla inesperada la cual deriva de una intermitencia con el proveedor biométrico.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Informar al proveedor de la falla ocurrida e informar al equipo correspondiente para que reintenten la operación\n3. Solicitar al cliente que espere la respuesta para reintentar la operación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"MQ9D1","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"TDD","tipo":"Técnico","codigo":"NC0K2","cuando":"Cuando el cliente desea desbloquear su tarjeta ( es decir, la tenía apagada para que no se realicen operaciones), el aplicativo le indica que ya se encuentra desbloqueada","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente cierre la aplicación y reintente el desbloqueo (o actualizar la aplicación)"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"O9GRX","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"OR351","cuando":"Cuando el cliente accede a su aplicativo, desea realizar una transferencia, sin embargo, el aplicativo informa que su sesión ha expirado","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Indicarle al cliente cierre sesión y/o salga del aplicativo e ingrese de nuevo"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"OWQ1S","cuando":"Cuando el usuario ingresa a la app, intenta realizar una transferencia pero la cuenta destino (beneficiario) sin embargo, este no se localiza en los contactos registrados","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Levantar el ticket en slack para que los equipos N1/N2 revisen el caso y lo escalen con los equipos correspondientes (en caso de ser necesario).\n3. Se le proporciona respuesta al cliente"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"PM4HJ","cuando":"Cuando el cliente realiza un registro en un dispositivo nuevo, sin embargo, ya cuenta con uno en un dispositivo distinto","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en slack para su atención N2\n3. Se le solicita al cliente documento \"Pertenencia dispositivo\" e \"INE\"\n4. Equipo N2 realiza gestión correspondiente\n5. Se le informa al cliente se puede enrolar al nuevo dispositivo"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"R8C9Q","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Inversiones","tipo":"Técnico","codigo":"RFWEG","cuando":"El usuario ingresa al aplicativo, intenta visualizar inversiones pero no arroja información","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Contacta al equipo de ICBS/Core bancario\n3. Se le solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"S1H2C","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"S42BF","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Home","tipo":"Técnico","codigo":"S7U20","cuando":"Cuando el cliente quiere visualizar los productos contratados, sin embargo, le arroja error","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Esperar respuesta de soporte N1-N2\n3. Se le comenta al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"S97UP","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"SNZNL","cuando":"Cuando el cliente desea iniciar sesión, captura número de cliente y contraseña, sin embargo arroja un error derivado de una intermitencia en el sistema","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que reintente su inicio de sesión"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"TF8V0","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"TK1FH","cuando":"El cliente accede al aplicativo, intenta realizar una transferencia sin embargo, derivado a una intermitencia, no permite realizar esta","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar la operación"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"TMZOL","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"U2V1F","cuando":"Cuando el cliente desea iniciar sesión, captura número de cliente y contraseña, sin embargo arroja un error derivado de una intermitencia en el sistema","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que reintente su inicio de sesión"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"U63TC","cuando":"Se presenta el error debido a que se hace la consulta a la información del cliente (en CRM) y este no muestra datos","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se levanta ticket en slack para canalizarlo al equipo correspondiente\n3. El equipo encargado deberá regresar respuesta del porqué ocurrió el error\n4. Se le proporciona respuesta al cliente"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"U86ZP","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"UDIQU","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"UT4AQ","cuando":"Cuando el cliente desea iniciar sesión, captura número de cliente y contraseña, sin embargo arroja un error derivado de una intermitencia en el sistema","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que reintente su inicio de sesión"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"VN0GL","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"WBGTE","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Inversiones","tipo":"Técnico","codigo":"WS4BB","cuando":"Cuando el cliente realiza una renovación de inversión sin embargo, derivado a la configuración erronea del dispositivo del cliente, no se puede realizar la operación","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente valide la configuración de fecha de su dispositivo\n3. Reintente realizar la renovación de su inversión"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"WVAHM","cuando":"Cuando el cliente desea ingresar al aplicativo y captura contraseña y/o usuario, automáticamente el sistema arroja un error y no permite el acceso (derivado de una intermitencia interna en servicios PUC)","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Solicitar al cliente que espere la respuesta para reintentar el ingreso"},{"categoria":"Inicio de sesión","tipo":"Técnico","codigo":"ZBBOD","cuando":"Cuando el cliente desea iniciar sesión, captura número de cliente y contraseña, sin embargo arroja un error derivado de una intermitencia en el sistema","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que reintente su inicio de sesión"},{"categoria":null,"tipo":null,"codigo":"ZTDIF","cuando":"sin datos del código","instruccion":null},{"categoria":"Transferencias","tipo":"Técnico","codigo":"4OPMK","cuando":"Error al momento de usar el token VU, falla por servidor de VU","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción para que el cliente vuelva a intentarlo"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"6JJ8U","cuando":"Error al momento de usar el token VU, falla por servidor de VU","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción para que el cliente vuelva a intentarlo"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"5P19B","cuando":"Error al momento de querer ver el listado de las cuentas que tienes guardadas por un problema de intermitencia","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción para que el cliente vuelva a intentarlo"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"R0BPG","cuando":"Error al momento de usar el token VU, falla por servidor de VU","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción para que el cliente vuelva a intentarlo"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"2GTPA","cuando":"Error al momento de usar el token VU, falla por servidor de VU","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción para que el cliente vuelva a intentarlo"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"0P6I7","cuando":"Error al momento de usar el token VU, falla por servidor de VU","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción para que el cliente vuelva a intentarlo"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"ZVZWQ","cuando":"Error al momento de usar el token VU, falla por servidor de VU","instruccion":"Es un error transversal, por lo cual:\n1. Levantar un ticket\n2. El equipo técnico debe indicar la instrucción para que el cliente vuelva a intentarlo"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"HMSKH","cuando":"Ocurre cuando hay una intermitencia interna en la comunicación en los servicios PUC","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"OUMNP","cuando":"Ocurre cuando hay una intermitencia interna en la comunicación en los servicios PUC","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"VR5E2","cuando":"Ocurre cuando hay una intermitencia interna en la comunicación en los servicios PUC","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"FXZS9","cuando":"Ocurre cuando hay una intermitencia interna en la comunicación en los servicios externos","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"NZ25L","cuando":"Ocurre cuando hay una intermitencia interna en la comunicación en los servicios externos","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Home","tipo":"Técnico","codigo":"XIMKB","cuando":"Al momento de consultar sus notificaciones, este indica que no se encuentra el usuario","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"M2MHI","cuando":"El usuario accede a la aplicación, navega y se va sin cerrar sesión. Cuando intenta retomar le arroja el modal \"se cerro sesión por inactividad\" y se contabiliza el código de error, no ve un error.","instruccion":"1. ATC debe levantar un ticket.\n2. Debe cerrar todas las aplicaciones abiertas en el dispositivo e intentar volver a ingresar"},{"categoria":"Tarjeta de débito","tipo":"Técnico","codigo":"DLL08","cuando":"Al hacer la peticion de la reposición de la TDD este falla debido a que falla un servicio externo","instruccion":"1. ATC debe levantar un ticket.\n2. Debe cerrar todas las aplicaciones abiertas en el dispositivo e intentar volver a ingresar"},{"categoria":"Créditos","tipo":"Técnico","codigo":"K8O9K","cuando":"Ocurre cuando hay una intermitencia interna en la comunicación en los servicios PUC al momento de querer descargar el PDF de sus créditos","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Transferencias","tipo":"Técnico","codigo":"UERF7","cuando":"Ocurre cuando hay una intermitencia interna en la comunicación en los servicios PUC al momento de querer realizar una transferencia","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Créditos","tipo":"Técnico","codigo":"F25NQ","cuando":"Ocurre cuando hay una intermitencia interna en la comunicación en los servicios PUC","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Enrolamiento","tipo":"Técnico","codigo":"8XJ58","cuando":"Ocurre cuando hay una intermitencia interna en la comunicación en los servicios PUC","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Se le solicita al cliente que espere respuesta"},{"categoria":"Transversal","tipo":"Técnico","codigo":"64UZU","cuando":"Cuando el cliente desea realizar la apertura de una cuenta, actualizar datos o activación de token, sin embargo, ocurre una falla inesperada la cual deriva de una intermitencia con el proveedor biométrico.","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Informar al proveedor de la falla ocurrida e informar al equipo correspondiente para que reintenten la operación\n3. Solicitar al cliente que espere la respuesta para reintentar la operación"},{"categoria":"Tarjeta de débito","tipo":"Técnico","codigo":"WOETN","cuando":"Al momento de desasociar la TDD por reposición este falla por intermitencia de un servicio externo","instruccion":"1. ATC debe levantar un ticket para que se contabilice\n2. Informar al proveedor de la falla ocurrida e informar al equipo correspondiente para que reintenten la operación\n3. Solicitar al cliente que espere la respuesta para reintentar la operación"}]</script>
+<script>
+(function(){
+  "use strict";
+
+  var RECORDS = JSON.parse(document.getElementById('records-data').textContent);
+  var PLACEHOLDER = "Sin información documentada";
+  var SIN_FUNCIONALIDAD = "Sin funcionalidad documentada";
+  var SIN_TIPO = "Sin tipo documentado";
+
+  function esc(str){
+    var div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function displayVal(v, placeholder){
+    return (v === null || v === undefined || v === '') ? (placeholder || PLACEHOLDER) : v;
+  }
+
+  // ---- Deterministic color per funcionalidad ----
+  function hashString(str){
+    var h = 0;
+    for(var i = 0; i < str.length; i++){
+      h = ((h << 5) - h) + str.charCodeAt(i);
+      h |= 0;
+    }
+    return Math.abs(h);
+  }
+  var funcColorCache = {};
+  function funcColor(name){
+    if(funcColorCache[name]) return funcColorCache[name];
+    var hue = hashString(name) % 360;
+    var color = {
+      dot: 'hsl(' + hue + ', 48%, 42%)',
+      bar: 'hsl(' + hue + ', 52%, 46%)'
+    };
+    funcColorCache[name] = color;
+    return color;
+  }
+
+  // ---- Tipo badge styling ----
+  var TIPO_STYLE = {
+    'Técnico':          { bg: 'var(--blue-tint)',   fg: 'var(--blue-dark)' },
+    'Regla de negocio': { bg: 'var(--amber-tint)',  fg: 'var(--amber)' },
+    'Usuario':          { bg: 'var(--green-tint)',  fg: 'var(--green)' },
+    'Negocio':          { bg: 'var(--violet-tint)', fg: 'var(--violet)' }
+  };
+  var TIPO_DEFAULT = { bg: 'var(--gray-tag-tint)', fg: 'var(--gray-tag)' };
+  function tipoStyle(tipo){
+    if(tipo && TIPO_STYLE[tipo]) return TIPO_STYLE[tipo];
+    return TIPO_DEFAULT;
+  }
+  function tipoBadgeHtml(tipo){
+    var label = displayVal(tipo, SIN_TIPO);
+    var st = tipoStyle(tipo);
+    return '<span class="tipo-badge" style="background:' + st.bg + ';color:' + st.fg + '">' + esc(label) + '</span>';
+  }
+  function funcChipHtml(categoria, extraClass){
+    var label = displayVal(categoria, SIN_FUNCIONALIDAD);
+    var col = funcColor(label);
+    return '<span class="func-chip' + (extraClass ? ' ' + extraClass : '') + '">' +
+      '<span class="func-dot" style="background:' + col.dot + '" aria-hidden="true"></span>' +
+      '<span class="func-name">' + esc(label) + '</span>' +
+    '</span>';
+  }
+
+  // ---- Derived aggregates ----
+  var totalCodigos = RECORDS.length;
+  var funcionalidadMap = {}; // name -> records[]
+
+  RECORDS.forEach(function(r){
+    var fkey = r.categoria || SIN_FUNCIONALIDAD;
+    if(!funcionalidadMap[fkey]) funcionalidadMap[fkey] = [];
+    funcionalidadMap[fkey].push(r);
+  });
+
+  var funcionalidades = Object.keys(funcionalidadMap).sort(function(a,b){
+    return funcionalidadMap[b].length - funcionalidadMap[a].length;
+  });
+
+  var totalFuncionalidades = funcionalidades.length;
+
+  // ---- KPI bar ----
+  function renderKpis(){
+    var kpis = [
+      { value: totalCodigos, label: 'Total de códigos' },
+      { value: totalFuncionalidades, label: 'Total de funcionalidades' }
+    ];
+    var html = kpis.map(function(k){
+      return '<div class="kpi"><div class="kpi-value">' + esc(k.value) + '</div><div class="kpi-label">' + esc(k.label) + '</div></div>';
+    }).join('');
+    document.getElementById('kpiBar').innerHTML = html;
+  }
+
+  // ---- Filter select ----
+  function populateFilterSelect(){
+    var select = document.getElementById('filterFuncionalidad');
+    var opts = ['<option value="">Todas las funcionalidades (' + totalCodigos + ')</option>'];
+    funcionalidades.forEach(function(f){
+      opts.push('<option value="' + esc(f) + '">' + esc(f) + ' (' + funcionalidadMap[f].length + ')</option>');
+    });
+    select.innerHTML = opts.join('');
+  }
+
+  // ---- State ----
+  var state = {
+    query: '',
+    funcionalidad: '',
+    selectedCode: null
+  };
+
+  function getFiltered(){
+    var q = state.query.trim().toLowerCase();
+    return RECORDS.filter(function(r){
+      if(state.funcionalidad){
+        var fkey = r.categoria || SIN_FUNCIONALIDAD;
+        if(fkey !== state.funcionalidad) return false;
+      }
+      if(q){
+        if(r.codigo.toLowerCase().indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderResults(){
+    var filtered = getFiltered();
+    var list = document.getElementById('resultsList');
+    var countEl = document.getElementById('resultsCount');
+    var clearFilterBtn = document.getElementById('clearFilterBtn');
+
+    countEl.textContent = filtered.length + (filtered.length === 1 ? ' código encontrado' : ' códigos encontrados');
+    clearFilterBtn.classList.toggle('visible', !!state.funcionalidad);
+
+    if(filtered.length === 0){
+      list.innerHTML = '<li class="empty-state"><div class="empty-title">No encontramos un código con ese criterio</div><div>Verifica el código o quita el filtro de funcionalidad.</div></li>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(function(r){
+      var current = (r.codigo === state.selectedCode);
+      return '<li>' +
+        '<button class="result-item" type="button" data-code="' + esc(r.codigo) + '" aria-current="' + (current ? 'true' : 'false') + '">' +
+          '<div class="result-code">' + esc(r.codigo) + '</div>' +
+          '<div class="result-meta">' +
+            funcChipHtml(r.categoria) +
+            tipoBadgeHtml(r.tipo) +
+          '</div>' +
+        '</button>' +
+      '</li>';
+    }).join('');
+  }
+
+  // Convert a numbered instruction ("1. ...\n2. ...") into an ordered list without altering the text.
+  function renderInstruccion(text){
+    if(!text){
+      return '<div class="instruccion-box muted"><div class="instruccion-text muted">' + esc(PLACEHOLDER) + '</div></div>';
+    }
+    var lines = text.split('\n');
+    var stepPattern = /^\s*\d+[.)]\s*/;
+    var isStepped = lines.length > 1 && lines.filter(function(l){ return l.trim() !== ''; }).every(function(l){ return stepPattern.test(l); });
+
+    if(isStepped){
+      var items = lines.filter(function(l){ return l.trim() !== ''; }).map(function(l){
+        var content = l.replace(stepPattern, '');
+        return '<li>' + esc(content) + '</li>';
+      }).join('');
+      return '<div class="instruccion-box"><ol class="instruccion-steps">' + items + '</ol></div>';
+    }
+    return '<div class="instruccion-box"><div class="instruccion-text">' + esc(text) + '</div></div>';
+  }
+
+  function renderDetail(){
+    var panel = document.getElementById('detailPanel');
+    if(!state.selectedCode){
+      panel.innerHTML = '<div class="detail-empty">Selecciona un código para consultar su ficha.</div>';
+      return;
+    }
+    var r = RECORDS.filter(function(x){ return x.codigo === state.selectedCode; })[0];
+    if(!r){
+      panel.innerHTML = '<div class="detail-empty">Selecciona un código para consultar su ficha.</div>';
+      return;
+    }
+    panel.innerHTML =
+      '<div class="detail-eyebrow">Ficha operativa</div>' +
+      '<div class="detail-code">' + esc(r.codigo) + '</div>' +
+      '<div class="detail-tags">' +
+        funcChipHtml(r.categoria, 'tag-funcionalidad') +
+        tipoBadgeHtml(r.tipo) +
+      '</div>' +
+      '<hr class="detail-divider">' +
+      '<div class="detail-section">' +
+        '<h3>¿Cuándo ocurre?</h3>' +
+        '<div class="cuando-text' + (r.cuando ? '' : ' muted') + '">' + esc(displayVal(r.cuando)) + '</div>' +
+      '</div>' +
+      '<div class="detail-section">' +
+        '<h3>Instrucción de atención</h3>' +
+        renderInstruccion(r.instruccion) +
+      '</div>';
+  }
+
+  function selectCode(code, opts){
+    state.selectedCode = code;
+    renderResults();
+    renderDetail();
+    if(opts && opts.mobileOpen){
+      document.body.classList.add('mobile-detail-open');
+    }
+    var panel = document.getElementById('detailPanel');
+    if(panel) panel.focus();
+  }
+
+  // ---- Event wiring: consulta view ----
+  document.getElementById('searchInput').addEventListener('input', function(e){
+    state.query = e.target.value;
+    document.getElementById('searchClear').classList.toggle('visible', !!state.query);
+    renderResults();
+  });
+
+  document.getElementById('searchClear').addEventListener('click', function(){
+    state.query = '';
+    var input = document.getElementById('searchInput');
+    input.value = '';
+    input.focus();
+    this.classList.remove('visible');
+    renderResults();
+  });
+
+  document.getElementById('filterFuncionalidad').addEventListener('change', function(e){
+    state.funcionalidad = e.target.value;
+    renderResults();
+  });
+
+  document.getElementById('clearFilterBtn').addEventListener('click', function(){
+    state.funcionalidad = '';
+    document.getElementById('filterFuncionalidad').value = '';
+    renderResults();
+  });
+
+  document.getElementById('resultsList').addEventListener('click', function(e){
+    var btn = e.target.closest('.result-item');
+    if(!btn) return;
+    selectCode(btn.getAttribute('data-code'), { mobileOpen: true });
+  });
+
+  document.getElementById('backToResults').addEventListener('click', function(){
+    document.body.classList.remove('mobile-detail-open');
+  });
+
+  // ---- Vista inventario ----
+  function renderInventory(){
+    var container = document.getElementById('inventoryList');
+    var maxCount = funcionalidadMap[funcionalidades[0]].length;
+
+    container.innerHTML = funcionalidades.map(function(f, idx){
+      var recs = funcionalidadMap[f];
+      var pct = ((recs.length / totalCodigos) * 100).toFixed(1);
+      var barPct = ((recs.length / maxCount) * 100).toFixed(1);
+      var col = funcColor(f);
+      var rowId = 'inv-codes-' + idx;
+      var codesHtml = recs.map(function(r){
+        return '<button class="inv-code-chip" type="button" data-code="' + esc(r.codigo) + '" data-func="' + esc(f) + '" style="border-color:' + col.dot + '55">' + esc(r.codigo) + '</button>';
+      }).join('');
+
+      return '<div class="inv-row-wrap">' +
+        '<div class="inv-row">' +
+          '<div class="inv-dot-cell"><span class="func-dot" style="background:' + col.dot + '" aria-hidden="true"></span></div>' +
+          '<div class="inv-name-cell">' +
+            '<button class="inv-name-btn" type="button" data-toggle="' + rowId + '" aria-expanded="false" aria-controls="' + rowId + '">' + esc(f) + '</button>' +
+            '<div class="inv-count">' + recs.length + (recs.length === 1 ? ' código' : ' códigos') + '</div>' +
+          '</div>' +
+          '<div class="inv-bar-track"><div class="inv-bar-fill" style="width:' + barPct + '%;background:' + col.bar + '"></div></div>' +
+          '<div class="inv-pct">' + pct + '%</div>' +
+          '<div class="inv-codes" id="' + rowId + '">' + codesHtml + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function goToConsultaWithFuncionalidad(func){
+    switchView('consulta');
+    state.funcionalidad = func;
+    document.getElementById('filterFuncionalidad').value = func;
+    renderResults();
+  }
+
+  document.getElementById('inventoryList').addEventListener('click', function(e){
+    var toggleBtn = e.target.closest('.inv-name-btn');
+    if(toggleBtn){
+      var id = toggleBtn.getAttribute('data-toggle');
+      var codesEl = document.getElementById(id);
+      var isOpen = codesEl.classList.toggle('open');
+      toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      return;
+    }
+    var chip = e.target.closest('.inv-code-chip');
+    if(chip){
+      var func = chip.getAttribute('data-func');
+      var code = chip.getAttribute('data-code');
+      goToConsultaWithFuncionalidad(func);
+      selectCode(code, { mobileOpen: true });
+    }
+  });
+
+  // ---- View switching ----
+  function switchView(view){
+    var isConsulta = (view === 'consulta');
+    document.getElementById('viewConsulta').hidden = !isConsulta;
+    document.getElementById('viewInventario').hidden = isConsulta;
+    document.getElementById('tabConsulta').setAttribute('aria-selected', isConsulta ? 'true' : 'false');
+    document.getElementById('tabInventario').setAttribute('aria-selected', isConsulta ? 'false' : 'true');
+  }
+
+  document.getElementById('tabConsulta').addEventListener('click', function(){ switchView('consulta'); });
+  document.getElementById('tabInventario').addEventListener('click', function(){ switchView('inventario'); });
+
+  // ---- Init ----
+  renderKpis();
+  populateFilterSelect();
+  renderResults();
+  renderDetail();
+  renderInventory();
+
+})();
+</script>
+</body>
+</html>
